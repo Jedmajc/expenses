@@ -3,4 +3,23 @@
     <string name="title_home">Główna</string>
     <string name="title_history">Historia</string>
     <string name="title_summary">Zestawienie</string>
+
+    <!-- Home Fragment -->
+    <string name="amount_hint">Kwota</string>
+    <string name="category_label">Kategoria:</string>
+    <string name="add_new_category">Dodaj nową kategorię…</string>
+    <string name="transaction_type_expense">Wydatek</string>
+    <string name="transaction_type_income">Przychód</string>
+    <string name="add_button">Dodaj</string>
+    <string name="description_hint">Opis (opcjonalnie)</string>
+
+    <!-- Add Category Dialog -->
+    <string name="dialog_add_category_title">Dodaj nową kategorię</string>
+    <string name="category_name_hint">Nazwa kategorii</string>
+    <string name="cancel_button">Anuluj</string>
+
+    <!-- History Item -->
+    <string name="amount_format">%.2f PLN</string>
+    <string name="delete_button_description">Usun</string>
+
 </resources>
