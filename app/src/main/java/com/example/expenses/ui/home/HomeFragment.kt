@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -47,33 +46,45 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupCategorySpinner()
+        setupTransactionTypeToggle()
+        setupAddCategoryButton() // Nowa funkcja
         setupAddButton()
         observeCategories()
 
+        // Ustawienie domyślnego stanu przy starcie
         binding.toggleGroupTransactionType.check(binding.buttonExpense.id)
+        viewModel.setTransactionType("expense")
+    }
+
+    private fun setupTransactionTypeToggle() {
+        binding.toggleGroupTransactionType.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                val type = when (checkedId) {
+                    binding.buttonIncome.id -> "income"
+                    else -> "expense"
+                }
+                viewModel.setTransactionType(type)
+            }
+        }
     }
 
     private fun setupCategorySpinner() {
         categoriesAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, mutableListOf<String>())
         categoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.categorySpinner.adapter = categoriesAdapter
+        // Usunięto stary onItemSelectedListener
+    }
 
-        binding.categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (parent?.getItemAtPosition(position).toString() == getString(R.string.add_new_category)) {
-                    showAddCategoryDialog()
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) { /* Do nothing */ }
+    private fun setupAddCategoryButton() {
+        binding.addCategoryButton.setOnClickListener {
+            showAddCategoryDialog()
         }
     }
 
     private fun observeCategories() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.allCategories.collectLatest { categories ->
-                val categoryNames = categories.map { it.name }.toMutableList()
-                categoryNames.add(getString(R.string.add_new_category))
+            viewModel.categoriesForType.collectLatest { categories ->
+                val categoryNames = categories.map { it.name }
                 categoriesAdapter.clear()
                 categoriesAdapter.addAll(categoryNames)
                 categoriesAdapter.notifyDataSetChanged()
@@ -85,33 +96,32 @@ class HomeFragment : Fragment() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_category, null)
         val categoryEditText = dialogView.findViewById<TextInputEditText>(R.id.category_name_edit_text)
 
-        val dialog = MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_add_category_title)
             .setView(dialogView)
             .setPositiveButton(R.string.add_button) { _, _ ->
                 val newCategoryName = categoryEditText.text.toString().trim()
                 if (newCategoryName.isNotEmpty()) {
-                    viewModel.insertCategory(Category(name = newCategoryName))
+                    val transactionType = when (binding.toggleGroupTransactionType.checkedButtonId) {
+                        binding.buttonIncome.id -> "income"
+                        else -> "expense"
+                    }
+                    viewModel.insertCategory(Category(name = newCategoryName, type = transactionType))
                 }
             }
-            .setNegativeButton(R.string.cancel_button) { _, _ ->
-                binding.categorySpinner.setSelection(0)
-            }
-            .create()
-
-        dialog.setOnDismissListener {
-            if (binding.categorySpinner.selectedItem.toString() == getString(R.string.add_new_category)) {
-                binding.categorySpinner.setSelection(0)
-            }
-        }
-
-        dialog.show()
+            .setNegativeButton(R.string.cancel_button, null)
+            .show()
     }
 
     private fun setupAddButton() {
         binding.addButton.setOnClickListener {
             val amountText = binding.amountEditText.text.toString()
             val description = binding.descriptionEditText.text.toString()
+            
+            if (binding.categorySpinner.selectedItem == null) {
+                Toast.makeText(requireContext(), "Dodaj i wybierz kategorię", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val selectedCategory = binding.categorySpinner.selectedItem.toString()
 
             if (amountText.isBlank()) {
@@ -122,11 +132,6 @@ class HomeFragment : Fragment() {
             val amount = amountText.toDoubleOrNull()
             if (amount == null || amount <= 0) {
                 Toast.makeText(requireContext(), "Nieprawidłowa kwota", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            if (selectedCategory == getString(R.string.add_new_category)) {
-                Toast.makeText(requireContext(), "Wybierz lub dodaj kategorię", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 

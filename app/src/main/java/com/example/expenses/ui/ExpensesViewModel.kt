@@ -8,20 +8,35 @@ import com.example.expenses.data.CategoryDao
 import com.example.expenses.data.CategorySummary
 import com.example.expenses.data.Expense
 import com.example.expenses.data.ExpenseDao
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ExpensesViewModel(
     private val expenseDao: ExpenseDao,
     private val categoryDao: CategoryDao
 ) : ViewModel() {
 
-    val allExpenses: Flow<List<Expense>> = expenseDao.getAllExpenses()
-    val allCategories: Flow<List<Category>> = categoryDao.getAllCategories()
+    // Prywatny, modyfikowalny stan dla typu transakcji
+    private val _transactionType = MutableStateFlow("expense")
 
-    // Dodane Flow dla podsumowań
+    val allExpenses: Flow<List<Expense>> = expenseDao.getAllExpenses()
+
+    // Publiczny, dynamiczny Flow kategorii, który zmienia się w zależności od _transactionType
+    val categoriesForType: Flow<List<Category>> = _transactionType.flatMapLatest {
+        type -> categoryDao.getCategoriesByType(type)
+    }
+
     val expenseSummary: Flow<List<CategorySummary>> = expenseDao.getExpenseSummaryByCategory()
     val incomeSummary: Flow<List<CategorySummary>> = expenseDao.getIncomeSummaryByCategory()
+
+    // Funkcja do aktualizacji typu transakcji z UI
+    fun setTransactionType(type: String) {
+        _transactionType.value = type
+    }
 
     fun insert(expense: Expense) {
         viewModelScope.launch {
