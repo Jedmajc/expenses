@@ -11,6 +11,7 @@ interface CategoryDao {
     @Insert
     suspend fun insert(category: Category)
 
+    // Zaktualizowane zapytanie z sortowaniem alfabetycznym
     @Query("SELECT * FROM categories ORDER BY name ASC")
     fun getAllCategories(): Flow<List<Category>>
 }
