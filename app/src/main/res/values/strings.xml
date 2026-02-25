@@ -12,6 +12,7 @@
     <string name="transaction_type_income">Przychód</string>
     <string name="add_button">Dodaj</string>
     <string name="description_hint">Opis (opcjonalnie)</string>
+    <string name="delete_button_description">Usuń wpis</string>
 
     <!-- Add Category Dialog -->
     <string name="dialog_add_category_title">Dodaj nową kategorię</string>
@@ -20,6 +21,9 @@
 
     <!-- History Item -->
     <string name="amount_format">%.2f PLN</string>
-    <string name="delete_button_description">Usun</string>
+
+    <!-- Summary Fragment -->
+    <string name="summary_expenses_header">Wydatki wg kategorii</string>
+    <string name="summary_incomes_header">Przychody wg kategorii</string>
 
 </resources>
