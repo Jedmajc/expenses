@@ -28,6 +28,14 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             tools:text="Pizza na mieście" />
 
+        <TextView
+            android:id="@+id/date_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            tools:text="25-05-2024 14:30" />
+
     </LinearLayout>
 
     <TextView

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">expenses</string>
+    <string name="app_name">Budget Tracker</string>
     <string name="title_home">Główna</string>
     <string name="title_history">Historia</string>
     <string name="title_summary">Zestawienie</string>

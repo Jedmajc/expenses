@@ -145,6 +145,7 @@ class HomeFragment : Fragment() {
             val newExpense = Expense(
                 amount = finalAmount,
                 category = selectedCategory,
+                date = System.currentTimeMillis(),
                 description = description,
                 type = transactionType
             )

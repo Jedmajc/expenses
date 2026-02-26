@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.expenses.R
 import com.example.expenses.data.Expense
 import com.example.expenses.databinding.ItemExpenseBinding
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class HistoryAdapter(private val onDeleteClicked: (Expense) -> Unit) : ListAdapter<Expense, HistoryAdapter.ExpenseViewHolder>(ExpenseDiffCallback()) {
 
@@ -25,10 +28,21 @@ class HistoryAdapter(private val onDeleteClicked: (Expense) -> Unit) : ListAdapt
         private val binding: ItemExpenseBinding,
         private val onDeleteClicked: (Expense) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
+
+        // Formatter do daty
+        private val dateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
+
         fun bind(expense: Expense) {
             binding.categoryTextView.text = expense.category
             binding.descriptionTextView.text = expense.description
             binding.amountTextView.text = String.format(itemView.context.getString(R.string.amount_format), expense.amount)
+
+            // Wyświetlanie daty
+            if (expense.date > 0) {
+                binding.dateTextView.text = dateFormat.format(Date(expense.date))
+            } else {
+                binding.dateTextView.text = ""
+            }
 
             val colorRes = if (expense.type == "expense") {
                 android.R.color.holo_red_dark
