@@ -22,6 +22,9 @@
     <!-- History Item -->
     <string name="amount_format">%.2f PLN</string>
 
+    <!-- History Fragment -->
+    <string name="all_categories_filter">Wszystkie kategorie</string>
+
     <!-- Summary Fragment -->
     <string name="summary_expenses_header">Wydatki wg kategorii</string>
     <string name="summary_incomes_header">Przychody wg kategorii</string>

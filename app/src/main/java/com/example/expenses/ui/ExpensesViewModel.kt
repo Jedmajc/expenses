@@ -3,7 +3,6 @@ package com.example.expenses.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.room.Transaction
 import com.example.expenses.data.Category
 import com.example.expenses.data.CategoryDao
 import com.example.expenses.data.CategorySummary
@@ -21,9 +20,19 @@ class ExpensesViewModel(
     private val categoryDao: CategoryDao
 ) : ViewModel() {
 
+    // Stany dla filtrów
     private val _transactionType = MutableStateFlow("expense")
+    private val _categoryFilter = MutableStateFlow<String?>(null) // null oznacza "Wszystkie"
 
-    val allExpenses: Flow<List<Expense>> = expenseDao.getAllExpenses()
+    // Dynamiczny Flow dla wydatków, reagujący na zmianę filtra kategorii
+    val filteredExpenses: Flow<List<Expense>> = _categoryFilter.flatMapLatest { category ->
+        if (category == null) {
+            expenseDao.getAllExpenses()
+        } else {
+            expenseDao.getExpensesForCategory(category)
+        }
+    }
+
     val categoriesForType: Flow<List<Category>> = _transactionType.flatMapLatest { type ->
         categoryDao.getCategoriesByType(type)
     }
@@ -32,8 +41,13 @@ class ExpensesViewModel(
     val expenseSummary: Flow<List<CategorySummary>> = expenseDao.getExpenseSummaryByCategory()
     val incomeSummary: Flow<List<CategorySummary>> = expenseDao.getIncomeSummaryByCategory()
 
+    // Funkcje do ustawiania filtrów z UI
     fun setTransactionType(type: String) {
         _transactionType.value = type
+    }
+
+    fun setCategoryFilter(category: String?) {
+        _categoryFilter.value = category
     }
 
     fun insert(expense: Expense) {
