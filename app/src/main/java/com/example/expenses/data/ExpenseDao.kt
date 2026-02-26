@@ -15,14 +15,16 @@ interface ExpenseDao {
     @Delete
     suspend fun delete(expense: Expense)
 
+    // Nowa funkcja do usuwania wszystkich wydatków o danej nazwie kategorii
+    @Query("DELETE FROM expenses WHERE category = :categoryName")
+    suspend fun deleteByCategoryName(categoryName: String)
+
     @Query("SELECT * FROM expenses ORDER BY id DESC")
     fun getAllExpenses(): Flow<List<Expense>>
 
-    // Zapytanie grupujące wydatki
     @Query("SELECT category, SUM(amount) as totalAmount FROM expenses WHERE type = 'expense' GROUP BY category ORDER BY totalAmount ASC")
     fun getExpenseSummaryByCategory(): Flow<List<CategorySummary>>
 
-    // Zapytanie grupujące przychody
     @Query("SELECT category, SUM(amount) as totalAmount FROM expenses WHERE type = 'income' GROUP BY category ORDER BY totalAmount DESC")
     fun getIncomeSummaryByCategory(): Flow<List<CategorySummary>>
 }

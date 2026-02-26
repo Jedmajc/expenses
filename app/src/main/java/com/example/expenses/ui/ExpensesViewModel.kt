@@ -3,6 +3,7 @@ package com.example.expenses.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.room.Transaction
 import com.example.expenses.data.Category
 import com.example.expenses.data.CategoryDao
 import com.example.expenses.data.CategorySummary
@@ -20,20 +21,17 @@ class ExpensesViewModel(
     private val categoryDao: CategoryDao
 ) : ViewModel() {
 
-    // Prywatny, modyfikowalny stan dla typu transakcji
     private val _transactionType = MutableStateFlow("expense")
 
     val allExpenses: Flow<List<Expense>> = expenseDao.getAllExpenses()
-
-    // Publiczny, dynamiczny Flow kategorii, który zmienia się w zależności od _transactionType
-    val categoriesForType: Flow<List<Category>> = _transactionType.flatMapLatest {
-        type -> categoryDao.getCategoriesByType(type)
+    val categoriesForType: Flow<List<Category>> = _transactionType.flatMapLatest { type ->
+        categoryDao.getCategoriesByType(type)
     }
+    val allCategoriesUnfiltered: Flow<List<Category>> = categoryDao.getAllCategoriesUnfiltered()
 
     val expenseSummary: Flow<List<CategorySummary>> = expenseDao.getExpenseSummaryByCategory()
     val incomeSummary: Flow<List<CategorySummary>> = expenseDao.getIncomeSummaryByCategory()
 
-    // Funkcja do aktualizacji typu transakcji z UI
     fun setTransactionType(type: String) {
         _transactionType.value = type
     }
@@ -53,6 +51,13 @@ class ExpensesViewModel(
     fun insertCategory(category: Category) {
         viewModelScope.launch {
             categoryDao.insert(category)
+        }
+    }
+
+    fun deleteCategoryAndExpenses(category: Category) {
+        viewModelScope.launch {
+            expenseDao.deleteByCategoryName(category.name)
+            categoryDao.delete(category)
         }
     }
 }

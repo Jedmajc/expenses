@@ -2,13 +2,20 @@ package com.example.expenses.ui.home
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.expenses.R
 import com.example.expenses.data.AppDatabase
 import com.example.expenses.data.Category
@@ -45,15 +52,34 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupMenu()
         setupCategorySpinner()
         setupTransactionTypeToggle()
-        setupAddCategoryButton() // Nowa funkcja
+        setupAddCategoryButton()
         setupAddButton()
         observeCategories()
 
-        // Ustawienie domyślnego stanu przy starcie
         binding.toggleGroupTransactionType.check(binding.buttonExpense.id)
         viewModel.setTransactionType("expense")
+    }
+
+    private fun setupMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.home_fragment_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_manage_categories -> {
+                        findNavController().navigate(R.id.action_homeFragment_to_manageCategoriesFragment)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun setupTransactionTypeToggle() {
@@ -72,7 +98,6 @@ class HomeFragment : Fragment() {
         categoriesAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, mutableListOf<String>())
         categoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.categorySpinner.adapter = categoriesAdapter
-        // Usunięto stary onItemSelectedListener
     }
 
     private fun setupAddCategoryButton() {
@@ -117,7 +142,7 @@ class HomeFragment : Fragment() {
         binding.addButton.setOnClickListener {
             val amountText = binding.amountEditText.text.toString()
             val description = binding.descriptionEditText.text.toString()
-            
+
             if (binding.categorySpinner.selectedItem == null) {
                 Toast.makeText(requireContext(), "Dodaj i wybierz kategorię", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener

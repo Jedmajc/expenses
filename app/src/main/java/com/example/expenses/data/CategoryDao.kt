@@ -1,6 +1,7 @@
 package com.example.expenses.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
@@ -11,7 +12,13 @@ interface CategoryDao {
     @Insert
     suspend fun insert(category: Category)
 
-    // Zaktualizowane zapytanie z filtrowaniem po typie
+    @Delete
+    suspend fun delete(category: Category)
+
     @Query("SELECT * FROM categories WHERE type = :type ORDER BY name ASC")
     fun getCategoriesByType(type: String): Flow<List<Category>>
+
+    // Nowa funkcja do pobierania wszystkich kategorii bez filtra
+    @Query("SELECT * FROM categories ORDER BY type, name ASC")
+    fun getAllCategoriesUnfiltered(): Flow<List<Category>>
 }

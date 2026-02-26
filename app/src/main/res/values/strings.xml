@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Budget Tracker</string>
+    <string name="app_name">Moje Wydatki</string>
     <string name="title_home">Główna</string>
     <string name="title_history">Historia</string>
     <string name="title_summary">Zestawienie</string>
@@ -25,5 +25,11 @@
     <!-- Summary Fragment -->
     <string name="summary_expenses_header">Wydatki wg kategorii</string>
     <string name="summary_incomes_header">Przychody wg kategorii</string>
+
+    <!-- Manage Categories -->
+    <string name="title_manage_categories">Zarządzaj kategoriami</string>
+    <string name="delete_category_dialog_title">Usunąć kategorię?</string>
+    <string name="delete_category_dialog_message">Spowoduje to również usunięcie wszystkich powiązanych z nią transakcji. Ta operacja jest nieodwracalna.</string>
+    <string name="delete_button">Usuń</string>
 
 </resources>
