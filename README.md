@@ -65,7 +65,7 @@ Użytkownik dodaje wpis:
 - typ: **wydatek** lub **przychód**
 - **kategoria** z listy
   - dodawanie nowej kategorii przez przycisk **„+”** obok listy
-  - usuwanie kategorii przez przycisk z ikoną **łuku** w prawym górnym rogu
+  - usuwanie kategorii przez przycisk z ikoną **klucza** w prawym górnym rogu
 - opcjonalny **opis**
 - przycisk **Dodaj** zapisuje rekord
 
